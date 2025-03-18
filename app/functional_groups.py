@@ -27,14 +27,11 @@ def process_csv_and_identify_groups(csv_file):
     :return: A list of dictionaries containing wavenumber, absorbance, and functional group.
     """
     try:
-        # Read the CSV file into a Pandas DataFrame
         df = pd.read_csv(csv_file.file)
         
-        # Validate required columns
         if 'Wavenumber' not in df.columns or 'Absorbance' not in df.columns:
             raise ValueError("CSV file must contain 'Wavenumber' and 'Absorbance' columns.")
         
-        # Identify functional groups for each wavenumber
         results = []
         for _, row in df.iterrows():
             wavenumber = row['Wavenumber']
@@ -64,12 +61,10 @@ def plot_spectrum_with_annotations(df, output_file="spectra_images/ftir_spectrum
     wavenumbers = df['Wavenumber']
     absorbance = df['Absorbance']
     
-    # Create the plot
     plt.figure(figsize=(10, 6))
     plt.plot(wavenumbers, absorbance, label="FTIR Spectrum", color="black")
-    plt.gca().invert_xaxis()  # FTIR spectra convention
+    plt.gca().invert_xaxis() 
     
-    # Annotate functional groups
     for _, row in df.iterrows():
         wavenumber = row['Wavenumber']
         absorbance_value = row['Absorbance']
@@ -86,14 +81,12 @@ def plot_spectrum_with_annotations(df, output_file="spectra_images/ftir_spectrum
                 color="red"
             )
     
-    # Labels and title
     plt.xlabel("Wavenumber (cm^-1)")
     plt.ylabel("Absorbance")
     plt.title("FTIR Spectrum with Functional Group Annotations")
     plt.grid()
     plt.legend()
     
-    # Save the plot
     plt.savefig(output_file, dpi=300, bbox_inches="tight")
     plt.close()
 

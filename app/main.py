@@ -5,21 +5,20 @@ from app.peak_detection import detect_peaks
 from fastapi.responses import FileResponse
 from app.functional_groups import identify_functional_group
 from datetime import datetime
+from pymongo import mongo_client
 import matplotlib.pyplot as plt
 import os
 
 app = FastAPI()
 
-# CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Replace with your frontend URL
+    allow_origins=["http://localhost:3000"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 
-# Path to save the spectrum image
 IMAGE_FOLDER = "spectra_images"
 
 @app.post("/upload_ftir/")
@@ -64,8 +63,16 @@ async def upload_ftir(file: UploadFile = File(...)):
             })
 
         # Step 4: Generate and save the FTIR spectrum plot
+       # Determine y-axis limits dynamically
+        y_min, y_max = min(absorbance), max(absorbance)
+        y_range = y_max - y_min
+        padding = y_range * 0.15  # Adding 15% extra space
+
         plt.figure(figsize=(10, 6))
         plt.plot(wavenumbers, absorbance, label="FTIR Spectrum", color="blue")
+
+        # Set new y-axis limits with padding
+        plt.ylim(y_min - padding, y_max + padding)
 
         # Annotate maxima
         for peak in detected_maxima:
@@ -112,7 +119,7 @@ async def upload_ftir(file: UploadFile = File(...)):
         return {
             "detected_maxima": detected_maxima,
             "detected_minima": detected_minima,
-            "image_filename": image_filename  # Return the image filename
+            "image_filename": image_filename  
         }
 
     except Exception as e:

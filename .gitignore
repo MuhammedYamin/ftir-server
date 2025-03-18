@@ -1,6 +1,6 @@
 # Ignore Python bytecode files
 *.pyc
-__pycache__/
+app/__pycache__/
 
 venv/
 spectra_images/
