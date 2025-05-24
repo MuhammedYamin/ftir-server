@@ -5,6 +5,7 @@ from app.peak_detection import detect_peaks
 from fastapi.responses import FileResponse
 from app.functional_groups import identify_functional_group
 from datetime import datetime
+from app.pdf_generator import router as pdf_router
 from pymongo import mongo_client
 import matplotlib.pyplot as plt
 import os
@@ -19,7 +20,10 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
-IMAGE_FOLDER = "spectra_images"
+app.include_router(pdf_router)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # server folder
+IMAGE_FOLDER = os.path.join(BASE_DIR, "spectra_images")
 
 @app.post("/upload_ftir/")
 async def upload_ftir(file: UploadFile = File(...)):
@@ -124,6 +128,7 @@ async def upload_ftir(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": str(e)}
+    
 
 @app.get("/get_spectrum_image/{image_filename}")
 async def get_spectrum_image(image_filename: str):
